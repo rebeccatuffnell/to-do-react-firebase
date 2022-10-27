@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import ToDo from "./ToDo";
+import {db} from './firebase';
+import { query, collection, QuerySnapshot } from 'firebase/firestore';
 
 const style = {
   bg: `h-screen w-screen p-4 bg-gradient-to-r from-[#3A03AC] to-[#1E90FF]`,
@@ -14,6 +16,18 @@ const style = {
 
 function App() {
   const [todos, setTodos] = useState(["Learn React Native"]);
+
+  // Create to-do
+
+  // Read to-do from Firebase
+useEffect(() => {
+  const q = query(collection(db, 'todos'))
+  const unsubscribe = onSnapshot(q, (QuerySnapshot))
+},[])
+
+  // Update to-do in Firebase
+
+  // Delete to-do
 
   return (
     <div className={style.bg}>
