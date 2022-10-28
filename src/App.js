@@ -8,6 +8,7 @@ import {
   onSnapshot,
   updateDoc,
   doc,
+  addDoc,
 } from "firebase/firestore";
 
 const style = {
@@ -22,8 +23,21 @@ const style = {
 
 function App() {
   const [todos, setTodos] = useState([]);
+  const [input, setInput] = useState("");
 
   // Create to-do
+  const createTodo = async (e) => {
+    e.preventDefault(e);
+    if (input === "") {
+      alert("Please type a to-do");
+      return;
+    }
+    await addDoc(collection(db, "todos"), {
+      text: input,
+      completed: false,
+    });
+    setInput("");
+  };
 
   // Read to-do from Firebase
   useEffect(() => {
@@ -51,8 +65,14 @@ function App() {
     <div className={style.bg}>
       <div className={style.container}>
         <h3 className={style.heading}>To-do List</h3>
-        <form className={style.form}>
-          <input className={style.input} type="text" placeholder="Add To-do" />
+        <form onSubmit={createTodo} className={style.form}>
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            className={style.input}
+            type="text"
+            placeholder="Add To-do"
+          />
           <button className={style.button}>
             <AiOutlinePlus size={30} />
           </button>
