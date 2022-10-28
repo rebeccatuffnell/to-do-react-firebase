@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import ToDo from "./ToDo";
-import {db} from './firebase';
-import { query, collection, onSnapshot } from 'firebase/firestore';
+import { db } from "./firebase";
+import {
+  query,
+  collection,
+  onSnapshot,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
 
 const style = {
   bg: `h-screen w-screen p-4 bg-gradient-to-r from-[#3A03AC] to-[#1E90FF]`,
@@ -10,7 +16,7 @@ const style = {
   heading: `text-3xl font-bold text-center text-gray-800 p-2`,
   form: `flex justify-between`,
   input: `border p-2 w-full text-xl`,
-  button: `border p-4 ml-2 bg-green-500 text-slate-100`,
+  button: `border p-4 ml-2 bg-orange-500 text-slate-100`,
   count: `text-center p-2`,
 };
 
@@ -20,19 +26,24 @@ function App() {
   // Create to-do
 
   // Read to-do from Firebase
-useEffect(() => {
-  const q = query(collection(db, 'todos'))
-  const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
-    let todosArr = []
-    QuerySnapshot.forEach((doc) => {
-      todosArr.push({...doc.data(), id: doc.id})
+  useEffect(() => {
+    const q = query(collection(db, "todos"));
+    const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
+      let todosArr = [];
+      QuerySnapshot.forEach((doc) => {
+        todosArr.push({ ...doc.data(), id: doc.id });
+      });
+      setTodos(todosArr);
     });
-    setTodos(todosArr)
-  })
-  return () => unsubscribe()
-},[])
+    return () => unsubscribe();
+  }, []);
 
   // Update to-do in Firebase
+  const toggleComplete = async (todo) => {
+    await updateDoc(doc(db, "todos", todo.id), {
+      completed: !todo.completed,
+    });
+  };
 
   // Delete to-do
 
@@ -48,7 +59,7 @@ useEffect(() => {
         </form>
         <ul>
           {todos.map((todo, index) => (
-            <ToDo key={index} todo={todo} />
+            <ToDo key={index} todo={todo} toggleComplete={toggleComplete} />
           ))}
         </ul>
         <p className={style.count}>You have 1 to-do</p>
